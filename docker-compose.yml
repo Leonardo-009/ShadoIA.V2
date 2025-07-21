@@ -1,0 +1,39 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BACKEND_URL=http://backend:3001
+    depends_on:
+      - backend
+    networks:
+      - shadoia-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - FRONTEND_URL=http://localhost:3000
+      # Adicione suas variáveis de ambiente aqui
+      # - OPENAI_API_KEY=your_openai_key
+      # - AZURE_OPENAI_API_KEY=your_azure_key
+      # - AZURE_OPENAI_ENDPOINT=your_azure_endpoint
+      # - VIRUSTOTAL_API_KEY=your_virustotal_key
+      # - ABUSEIPDB_API_KEY=your_abuseipdb_key
+    networks:
+      - shadoia-network
+    restart: unless-stopped
+
+networks:
+  shadoia-network:
+    driver: bridge 

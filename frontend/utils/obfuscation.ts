@@ -103,65 +103,58 @@ function escapeRegex(string: string): string {
 }
 
 // Função para gerar o prompt da IA com dados ofuscados
-export function generateAIPrompt(obfuscatedLog: string, reportType: string): string {
-  const basePrompt = `Você é um analista de segurança cibernética. Analise o log e gere um relatório profissional no formato exato abaixo. Preencha apenas os campos disponíveis no log. Se não disponível no log, não traga no relatório. Use linguagem objetiva e evite jargões excessivos.
+export function generateAIPrompt(obfuscatedLog: string, _reportType: string): string {
+  return `
+Você é um analista sênior de segurança cibernética. Analise o log abaixo e produza um relatório profissional, preenchendo apenas os campos para os quais houver informação disponível. Seja objetivo, evite jargões técnicos desnecessários e forneça recomendações práticas e acionáveis.
 
-Instruções IMPORTANTES:
-1. Remova do Evidências todos os "não disponíveis".
-2. Para as recomendações, liste cada item com um bullet point (•) em uma linha separada, SEM números.
-3. Remova completamente qualquer seção que não tenha informações válidas.
+Estruture sua resposta nos seguintes tópicos (remova qualquer campo sem informação):
 
-Caso de uso: Descreva o evento (ex.: falha de login, acesso não autorizado) com base no log.
-Análise: Forneça uma análise técnica detalhada, incluindo contexto (tipo de evento), impacto potencial (ex.: interrupção de serviço) e implicações.
-Objetivo do caso de uso: Especifique o objetivo da análise (ex.: detectar intrusões, identificar falhas de autenticação).
-Fonte de dados: Use "Windows Event Log" para logs XML ou "Syslog" para logs Syslog. Se não identificável, não traga o campo.
-Justificativa: Explique por que o evento justifica investigação, considerando gravidade, tipo de evento, número de tentativas (se aplicável) e impacto potencial (ex.: comprometimento de credenciais).
-Recomendações: Liste 3 ações práticas e acionáveis para mitigar o evento e prevenir recorrências, alinhadas com padrões como NIST ou CIS Controls.
-Resultado: Derive do campo 'message' (ex.: "Failed" para "Login failed") ou não traga o campo se não aplicável.
-Status: Não traga o campo, a menos que o log forneça um campo 'status' explícito.
+1. Resumo Executivo: Descreva brevemente o evento, seu contexto e relevância para a segurança.
+2. Indicadores Detectados: Liste todos os IPs, usuários, domínios, hashes, processos, comandos, arquivos, sessões e outros identificadores relevantes encontrados no log.
 
-Modelo:
 Prezados(as), {saudacao}.
 Atividade suspeita detectada, no ambiente. Detalhes para validação:
 
 Caso de uso: [Descreva o evento com base no log]
-🕵 Análise: [Forneça uma análise técnica do evento]
-📊 Fonte: [Identifique a fonte do log, ex.: Windows Event Log, Syslog]
-🚨 Severidade: [Classifique a severidade, ex.: Baixa, Moderada, Alta]
-🧾 Evidências:
-[Inclua apenas campos com informações disponíveis]
-Data do Log: [Data e hora do evento]
-Fonte do Log: [Sistema ou componente que gerou o log]
-Usuário de Origem: [Usuário que iniciou a atividade, se aplicável]
-Usuário Afetado: [Usuário impactado, se aplicável]
-IP/Host de Origem: [IP ou host que iniciou a atividade]
-IP/Host Afetado: [IP ou host impactado]
-Localização (Origem/Impactado): [Localização geográfica ou lógica, se disponível]
-Tipo do Evento: [Tipo de evento, ex.: acesso não autorizado]
-Grupo: [Categoria do evento, ex.: segurança web, autenticação]
-Objeto: [Recurso alvo, ex.: diretório, arquivo]
-Nome do Objeto: [Nome específico do recurso]
-Tipo do Objeto: [Tipo de recurso, ex.: diretório web, banco de dados]
-Assunto: [Resumo do evento, ex.: tentativa de acesso a diretório restrito]
-Política: [Política de segurança violada, se aplicável]
-Nome da Ameaça: [Nome da ameaça, ex.: sondagem automatizada]
-Nome do Processo: [Processo envolvido, se aplicável]
-Nome da Regra MPE: {ruleName}
-Mensagem do Fornecedor: [Mensagem ou código de erro do sistema]
-ID do Fornecedor: [Identificador único do evento, se disponível]
-Identificador de Navegador: [User-agent ou identificador, se aplicável]
-Ação: [Ação realizada, ex.: tentativa de acesso]
-Status: [Status da ação, ex.: sucesso, falha]
-Log: {log}
 
-🕵 Justificativa: [Explique o motivo da suspeita com base no log]
+🕵 Análise: [Forneça uma análise técnica do evento]
+
+📊 Fonte: [Identifique a fonte do log, ex.: Windows Event Log, Syslog]
+
+🚨 Severidade: [Classifique a severidade, ex.: Baixa, Moderada, Alta]
+
+🧾 Evidências:
+
+[Inclua apenas campos com informações disponíveis]
+Data do Log: 
+Fonte do Log:
+Usuário de Origem: 
+Usuário Afetado:
+IP/Host de Origem: 
+IP/Host Afetado:
+Localização (Origem/Impactado):
+Tipo do Evento: 
+Grupo: 
+Objeto:
+Nome do Objeto: 
+Tipo do Objeto: 
+Assunto: 
+Política: 
+Nome da Ameaça: 
+Nome do Processo:
+Nome da Regra MPE:
+Mensagem do Fornecedor:
+ID do Fornecedor: 
+Identificador de Navegador:
+Ação: 
+Status: 
+
+🕵 Justificativa: [Por que este evento merece atenção? Considere gravidade, contexto, recorrência, possíveis riscos e relação com políticas de segurança.]
+
 📌 Recomendações:
-• [Recomendação prática com base no log]
-• [Recomendação adicional para mitigar o evento]
-• [Recomendação final]
+
 
 Log para análise:
-${obfuscatedLog}`
-
-  return basePrompt
+${obfuscatedLog}
+`
 }

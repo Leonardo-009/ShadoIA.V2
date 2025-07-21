@@ -54,11 +54,20 @@ router.post("/test-prompt", asyncHandler(async (req, res) => {
 
 // Main analyze endpoint
 router.post("/", validateAnalyzeRequest, asyncHandler(async (req, res) => {
-  const result = await analyzeLogController(req.body)
-  if (!result) {
-    return res.status(500).json({ error: "Erro ao analisar log" })
+  // Só aceita provider 'gemini'
+  if (req.body.provider !== "gemini") {
+    return res.status(400).json({ error: "Somente o provider 'gemini' está habilitado neste backend." })
   }
-  return res.json(result)
+  try {
+    const result = await analyzeLogController(req.body)
+    if (!result) {
+      return res.status(500).json({ error: "Erro ao analisar log" })
+    }
+    return res.json(result)
+  } catch (error) {
+    // Retorna mensagem detalhada para o frontend
+    return res.status(500).json({ error: error instanceof Error ? error.message : String(error) })
+  }
 }))
 
 export default router

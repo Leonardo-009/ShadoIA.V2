@@ -36,16 +36,16 @@ ShadoIA.V2/
 
 1. **Configure as variáveis de ambiente:**
    - Copie os arquivos de exemplo:
-     ```bash
+```bash
      cp backend/env.example backend/.env
      cp frontend/env.example frontend/.env
      ```
    - Edite os arquivos `.env` conforme necessário (adicione suas chaves de API).
 
 2. **Suba os containers:**
-   ```bash
-   docker-compose up --build
-   ```
+```bash
+docker-compose up --build
+```
 
 3. **Acesse a aplicação:**
    - Frontend: [http://localhost:3000](http://localhost:3000)

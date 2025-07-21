@@ -44,7 +44,7 @@ export async function analyzeLogController(data: AnalyzeRequest) {
     return analysisResult
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`Failed to analyze log: ${error.message}`)
+    throw new Error(`Failed to analyze log: ${error.message}`)
     }
     throw new Error("Failed to analyze log: Unknown error")
   }

@@ -21,6 +21,55 @@ export default function AnalysePage() {
   const { toast } = useToast()
   const [reportType, setReportType] = useState("completo")
 
+  const SAUDE_SIEM_PROMPT = `Você é um analista de segurança cibernética especializado em monitoramento e manutenção da saúde de sistemas SIEM. Sua tarefa é analisar o log fornecido, identificar possíveis problemas relacionados à saúde do SIEM (ex.: falhas na coleta de logs, atrasos, falsos positivos, regras mal configuradas, integrações inativas) e redigir um relatório claro, conciso e profissional para a equipe de manutenção do SIEM.
+
+Instruções:
+- Remova qualquer campo ou seção sem informação válida.
+- Use linguagem técnica acessível, voltada para operação e sustentação de sistemas SIEM.
+
+Modelo do Relatório:
+
+Prezados(as), {saudacao}.
+
+Nossa equipe identificou uma possível questão relacionada à saúde do SIEM que requer validação. Seguem abaixo mais detalhes para análise:
+
+Caso de uso: [Descrição do caso de uso, ex.: "Verificar a integridade da coleta de logs para identificar falhas ou atrasos na ingestão de dados."]
+
+🕵 Justificativa para abertura do caso: [Explicação do motivo pelo qual o log indica um problema, ex.: "O log mostra um atraso significativo na ingestão de dados, sugerindo problemas na integração com a fonte de dados."]
+
+Objetivo do caso de uso: [Objetivo da análise, ex.: "Garantir que os logs sejam coletados em tempo real para evitar lacunas no monitoramento de segurança."]
+
+📊 Fonte de dados utilizada na análise: [Fonte dos dados, ex.: "Windows Event Log", "Syslog"]
+
+🧾 Evidências:
+Data do Log: [Data e hora do evento]
+Fonte do Log: [Sistema ou componente que gerou o log]
+Usuário de Origem: [Usuário associado, se aplicável]
+Usuário Afetado: [Usuário impactado, se aplicável]
+IP/Host de Origem: [IP ou host que gerou o evento]
+IP/Host Afetado: [IP ou host impactado]
+Localização (Origem/Impactado): [Localização geográfica ou lógica, se disponível]
+Tipo do Evento: [Tipo de evento, ex.: falha de integração]
+Grupo: [Categoria do evento, ex.: saúde do SIEM]
+Objeto: [Recurso alvo, ex.: conector]
+Nome do Objeto: [Nome específico do recurso, ex.: Conector_Firewall_X]
+Tipo do Objeto: [Tipo de recurso, ex.: conector]
+Assunto: [Resumo do evento, ex.: falha na coleta de logs]
+Política: [Política ou configuração relevante, se aplicável]
+Nome da Ameaça: [Nome do problema, ex.: atraso na ingestão]
+Nome do Processo: [Processo envolvido, ex.: ingestão de logs]
+Nome da Regra MPE: [Regra que disparou o alerta, se aplicável]
+Mensagem do Fornecedor: [Mensagem ou código de erro do sistema]
+ID do Fornecedor: [Identificador único do evento, se disponível]
+Identificador de Navegador: [User-agent, se aplicável]
+Ação: [Ação relacionada, ex.: tentativa de coleta]
+Status: [Status da ação, ex.: falha]
+Resultado: [Resultado final, ex.: log não coletado]
+
+Log: {log}
+
+Gere o relatório EXATAMENTE no formato especificado, preenchendo todos os campos com base no log fornecido.`;
+
   const handleAnalyze = async () => {
     if (!logText.trim() || !provider) {
       toast({
@@ -43,6 +92,7 @@ export default function AnalysePage() {
           logText,
           provider,
           reportType,
+          prompt: reportType === "saude-siem" ? SAUDE_SIEM_PROMPT : undefined,
         }),
       })
 
@@ -172,6 +222,12 @@ Data: ${new Date().toLocaleString("pt-BR")}
                       <RadioGroupItem value="completo" id="completo" />
                       <label htmlFor="completo" className="text-sm">
                         Relatório Completo
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <RadioGroupItem value="saude-siem" id="saude-siem" />
+                      <label htmlFor="saude-siem" className="text-sm">
+                        Saúde de SIEM
                       </label>
                     </div>
                   </RadioGroup>

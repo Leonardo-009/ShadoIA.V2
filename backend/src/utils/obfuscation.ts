@@ -95,9 +95,7 @@ Estruture sua resposta nos seguintes tópicos:
 
 Modelo:
 Prezados(as), {saudacao}.
-Atividade suspeita detectada, no ambiente. Detalhes para validação:
-
-Caso de uso: [Descreva o evento com base no log]
+Foi identificada atividade suspeita pela equipe de monitoramento no seu ambiente. Detalhes para validação:
 
 🕵 Análise: [Forneça uma análise técnica do evento]
 

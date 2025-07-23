@@ -20,7 +20,7 @@ ANTHROPIC_API_KEY=sk-ant-your-anthropic-api-key-here
 
 # Threat Intelligence APIs
 VIRUSTOTAL_API_KEY=your-virustotal-api-key-here
-ABUSEIPDB_API_KEY=0973a6b4b5c5b48188183f9fa0fb2fd151593e7122319040e1f76bedd512e34b4d38f60848b4bc11
+ABUSEIPDB_API_KEY=
 
 # Cache Configuration
 CACHE_TTL=3600

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertTriangle, Brain, FileText, Lock, Search, Shield } from "lucide-react"
+import { AlertTriangle, Brain, FileText, Search, Shield } from "lucide-react"
 import Link from "next/link"
 
 export default function HomePage() {
@@ -36,6 +36,10 @@ export default function HomePage() {
                 <div className="flex items-center">
                   <Brain className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-2" />
                   <span>Relatório Completo</span>
+                </div>
+                <div className="flex items-center">
+                  <Shield className="h-4 w-4 text-green-600 dark:text-green-400 mr-2" />
+                  <span>Saúde do SIEM</span>
                 </div>
               </div>
               <Link href="/analise" className="block">

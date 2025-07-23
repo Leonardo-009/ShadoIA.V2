@@ -24,9 +24,9 @@ services:
       - NODE_ENV=production
       - PORT=3001
       - FRONTEND_URL=http://localhost:3000
-      - GOOGLE_GEMINI_API_KEY=AIzaSyCl6QqzT1YF9Ad2jFa2QcKECMcWEhP40bc
-      - VIRUSTOTAL_API_KEY=d35df5b3a1d7969d2dc93b6dbed5ade97ab81325346fccb3bc0b0df5a23a9a76
-      - ABUSEIPDB_API_KEY=29572b812308a6bdaa13b55a8e27c23b9015f4de3553ef2aa6bdb81dbe64a194e91128bb7f5a55d4
+      - GOOGLE_GEMINI_API_KEY=
+      - VIRUSTOTAL_API_KEY=
+      - ABUSEIPDB_API_KEY=
       # Adicione suas variáveis de ambiente aqui
       # - OPENAI_API_KEY=your_openai_key
       # - AZURE_OPENAI_API_KEY=your_azure_key

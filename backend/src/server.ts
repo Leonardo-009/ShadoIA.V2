@@ -1,15 +1,15 @@
-import express, { Express } from "express"
 import cors from "cors"
+import dotenv from "dotenv"
+import express, { Express } from "express"
+import rateLimit from "express-rate-limit"
 import helmet from "helmet"
 import morgan from "morgan"
-import dotenv from "dotenv"
-import rateLimit from "express-rate-limit"
 
 // Routes
 import analyzeRoutes from "./routes/analyze"
-import threatRoutes from "./routes/threats"
-import healthRoutes from "./routes/health"
 import cacheRoutes from "./routes/cache"
+import healthRoutes from "./routes/health"
+import threatRoutes from "./routes/threats"
 
 // Middleware
 import { errorHandler } from "./middleware/errorHandler"

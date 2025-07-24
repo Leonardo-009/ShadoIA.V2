@@ -27,6 +27,7 @@ services:
       - GOOGLE_GEMINI_API_KEY=
       - VIRUSTOTAL_API_KEY=
       - ABUSEIPDB_API_KEY=
+
       # Adicione suas variáveis de ambiente aqui
       # - OPENAI_API_KEY=your_openai_key
       # - AZURE_OPENAI_API_KEY=your_azure_key

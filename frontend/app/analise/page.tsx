@@ -131,13 +131,12 @@ Gere o relatório EXATAMENTE no formato especificado, preenchendo todos os campo
   }
 
   const generateReportText = (report: any) => {
-    return `RELATÓRIO DE ANÁLISE DE SEGURANÇA
+    // Helper para mostrar apenas campos preenchidos
+    const show = (label: string, value: any) => value ? `${label}: ${value}\n` : '';
+    return `RELATÓRIO DE ANÁLISE DA EQUIPE DE MONITORAMENTO
 
-${report.greeting}
-
-${report.introduction}
-
-Caso de uso: ${report.caseUse}
+Prezados(as), ${report.greeting}
+Foi identificado atividade suspeita detectada pela equipe de monitoramento, no seu ambiente. Detalhes para validação:
 
 🕵 Análise: ${report.analysis}
 
@@ -146,29 +145,35 @@ Caso de uso: ${report.caseUse}
 🚨 Severidade: ${report.severity}
 
 🧾 Evidências:
-Data do Log: ${report.evidence.logDate}
-Fonte do Log: ${report.evidence.logSource}
-Usuário Afetado: ${report.evidence.affectedUser}
-IP/Host de Origem: ${report.evidence.originIP}
-Tipo do Evento: ${report.evidence.eventType}
-Grupo: ${report.evidence.group}
-Objeto: ${report.evidence.object}
-Assunto: ${report.evidence.subject}
-Nome da Ameaça: ${report.evidence.threatName}
-Nome da Regra MPE: ${report.evidence.ruleName}
-Ação: ${report.evidence.action}
-Status: ${report.evidence.status}
+[Inclua apenas campos com informações disponíveis]
+${show('Data do Log', report.evidence.logDate)}
+${show('Fonte do Log', report.evidence.logSource)}
+${show('Usuário de Origem', report.evidence.originUser)}
+${show('Usuário Afetado', report.evidence.affectedUser)}
+${show('IP/Host de Origem', report.evidence.originIP)}
+${show('IP/Host Afetado', report.evidence.affectedIP)}
+${show('Localização (Origem/Impactado)', report.evidence.location)}
+${show('Tipo do Evento', report.evidence.eventType)}
+${show('Grupo', report.evidence.group)}
+${show('Objeto', report.evidence.object)}
+${show('Nome do Objeto', report.evidence.objectName)}
+${show('Tipo do Objeto', report.evidence.objectType)}
+${show('Assunto', report.evidence.subject)}
+${show('Política', report.evidence.policy)}
+${show('Nome da Ameaça', report.evidence.threatName)}
+${show('Nome do Processo', report.evidence.processName)}
+${show('Nome da Regra MPE', report.evidence.ruleName)}
+${show('Mensagem do Fornecedor', report.evidence.vendorMessage)}
+${show('ID do Fornecedor', report.evidence.vendorId)}
+${show('Identificador de Navegador', report.evidence.userAgent)}
+${show('Ação', report.evidence.action)}
+${show('Status', report.evidence.status)}
+${show('Log', report.evidence.log)}
 
-Mensagem do Fornecedor: ${report.evidence.vendorMessage}
-
-🕵 Justificativa: ${report.justification}
+🕵 Justificativa: [Por que este evento merece atenção? Considere gravidade, contexto, recorrência, possíveis riscos e relação com políticas de segurança.]
 
 📌 Recomendações:
 ${report.recommendations.map((rec: string) => `• ${rec}`).join("\n")}
-
----
-Relatório gerado automaticamente pelo ShadoIA
-Data: ${new Date().toLocaleString("pt-BR")}
 `
   }
 

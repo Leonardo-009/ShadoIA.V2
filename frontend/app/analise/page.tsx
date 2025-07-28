@@ -230,11 +230,11 @@ Gere o relatório EXATAMENTE no formato especificado, preenchendo todos os campo
               <CardHeader>
                 <CardTitle className="flex items-center text-green-800">
                   <Shield className="h-5 w-5 mr-2" />
-                  Proteção de Dados Automática
+                  Proteção de Dados Inteligente
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-green-700">
-                <p className="text-sm mb-3">Dados detectados e ofuscados automaticamente antes do envio para IA:</p>
+                <p className="text-sm mb-3">Dados detectados e protegidos automaticamente:</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>• IPs (IPv4/IPv6)</div>
                   <div>• Emails</div>
@@ -242,15 +242,32 @@ Gere o relatório EXATAMENTE no formato especificado, preenchendo todos os campo
                   <div>• Domínios</div>
                   <div>• Hashes (MD5/SHA)</div>
                   <div>• Session IDs</div>
+                  <div>• Senhas</div>
+                  <div>• Tokens</div>
+                  <div>• Cartões de Crédito</div>
+                  <div>• Telefones</div>
                 </div>
                 {obfuscationResult && (
                   <div className="mt-3 p-2 bg-green-100 rounded text-xs">
-                    <strong>Dados detectados neste log:</strong>
-                    <div className="mt-1">
-                      {obfuscationResult?.ips?.length > 0 && <div>IPs: {obfuscationResult?.ips?.length}</div>}
-                      {obfuscationResult?.emails?.length > 0 && <div>Emails: {obfuscationResult?.emails?.length}</div>}
-                      {obfuscationResult?.users?.length > 0 && <div>Usuários: {obfuscationResult?.users?.length}</div>}
-                      {obfuscationResult?.hashes?.length > 0 && <div>Hashes: {obfuscationResult?.hashes?.length}</div>}
+                    <strong>Estatísticas de Proteção:</strong>
+                    <div className="mt-1 space-y-1">
+                      <div>Total detectado: {analysisResult?.obfuscationStats?.totalDetected || 0}</div>
+                      <div>Ofuscados: {analysisResult?.obfuscationStats?.obfuscatedCount || 0}</div>
+                      <div>Preservados: {analysisResult?.obfuscationStats?.preservedCount || 0}</div>
+                      <div>Contexto preservado: {analysisResult?.obfuscationStats?.contextPreserved ? 'Sim' : 'Não'}</div>
+                    </div>
+                    <div className="mt-2">
+                      <strong>Dados detectados neste log:</strong>
+                      <div className="mt-1">
+                        {obfuscationResult?.ips?.length > 0 && <div>IPs: {obfuscationResult?.ips?.length}</div>}
+                        {obfuscationResult?.emails?.length > 0 && <div>Emails: {obfuscationResult?.emails?.length}</div>}
+                        {obfuscationResult?.users?.length > 0 && <div>Usuários: {obfuscationResult?.users?.length}</div>}
+                        {obfuscationResult?.hashes?.length > 0 && <div>Hashes: {obfuscationResult?.hashes?.length}</div>}
+                        {obfuscationResult?.passwords?.length > 0 && <div>Senhas: {obfuscationResult?.passwords?.length}</div>}
+                        {obfuscationResult?.tokens?.length > 0 && <div>Tokens: {obfuscationResult?.tokens?.length}</div>}
+                        {obfuscationResult?.creditCards?.length > 0 && <div>Cartões: {obfuscationResult?.creditCards?.length}</div>}
+                        {obfuscationResult?.phoneNumbers?.length > 0 && <div>Telefones: {obfuscationResult?.phoneNumbers?.length}</div>}
+                      </div>
                     </div>
                   </div>
                 )}

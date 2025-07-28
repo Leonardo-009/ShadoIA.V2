@@ -25,8 +25,11 @@ export async function analyzeLogController(data: AnalyzeRequest) {
     }
   }
 
-  // Obfuscate sensitive data
-  const obfuscationResult = obfuscateLogData(logText)
+  // Obfuscate sensitive data with intelligent obfuscation
+  const obfuscationResult = obfuscateLogData(logText, {
+    preserveContext: true,
+    smartDetection: true
+  })
 
   let analysisResult: Record<string, unknown>
 
@@ -76,6 +79,7 @@ Retorne apenas um JSON com:
       type: "saude",
       ...healthData,
       obfuscatedData: obfuscationResult.detectedData,
+      obfuscationStats: obfuscationResult.obfuscationStats,
       aiUsage: aiResponse.usage,
     }
   } catch {
@@ -94,6 +98,7 @@ Retorne apenas um JSON com:
       ],
       summary: "Análise de saúde baseada no log fornecido",
       obfuscatedData: obfuscationResult.detectedData,
+      obfuscationStats: obfuscationResult.obfuscationStats,
       aiUsage: aiResponse.usage,
     }
   }
@@ -123,6 +128,7 @@ Retorne apenas um JSON com:
       type: "refinar",
       ...refineData,
       obfuscatedData: obfuscationResult.detectedData,
+      obfuscationStats: obfuscationResult.obfuscationStats,
       aiUsage: aiResponse.usage,
     }
   } catch {
@@ -136,6 +142,7 @@ Retorne apenas um JSON com:
       details: "Refinamento automático aplicado ao log",
       summary: "Análise refinada com base nos padrões identificados",
       obfuscatedData: obfuscationResult.detectedData,
+      obfuscationStats: obfuscationResult.obfuscationStats,
       aiUsage: aiResponse.usage,
     }
   }
@@ -152,6 +159,7 @@ async function generateCompleteReport(obfuscationResult: ObfuscationResult, prov
     reportText,
     report: parseReportFromAI(reportText),
     obfuscatedData: obfuscationResult.detectedData,
+    obfuscationStats: obfuscationResult.obfuscationStats,
     confidence: calculateConfidence(reportText),
     aiUsage: aiResponse.usage,
   }

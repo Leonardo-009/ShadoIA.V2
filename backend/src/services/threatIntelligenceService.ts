@@ -79,21 +79,45 @@ export class ThreatIntelligenceService {
         status = "suspicious"
         confidence = Math.min(80, 40 + (suspicious / total) * 40)
       } else {
-        // Para URLs limpas, a confiança deve ser baixa (indicando que é confiável)
-        // Quanto mais análises harmless, menor a confiança (mais confiável)
+        // Para itens limpos, a confiança deve ser alta (indicando que é confiável)
+        // Quanto mais análises harmless, maior a confiança (mais confiável)
         const harmlessRatio = (stats.harmless || 0) / total
-        confidence = Math.max(10, 100 - (harmlessRatio * 100))
+        const undetectedRatio = (stats.undetected || 0) / total
+        
+        // Base da confiança: 70% para itens limpos
+        // Aumenta com mais análises harmless, diminui com mais undetected
+        confidence = Math.max(60, Math.min(95, 70 + (harmlessRatio * 25) - (undetectedRatio * 15)))
+      }
+
+      // Extrair informações adicionais
+      let threatType = undefined
+      if (data.data.attributes.tags && data.data.attributes.tags.length > 0) {
+        threatType = data.data.attributes.tags[0]
       }
 
       return {
         value: indicator,
         status,
         confidence: Math.round(confidence),
+        threat_type: threatType,
         source: "VirusTotal",
         detections: malicious + suspicious,
         country: data.data.attributes.country,
         lastSeen: data.data.attributes.last_seen,
-        details: stats,
+        details: {
+          last_analysis_stats: stats,
+          tags: data.data.attributes.tags,
+          reputation: data.data.attributes.reputation,
+          as_owner: data.data.attributes.as_owner,
+          continent: data.data.attributes.continent,
+          city: data.data.attributes.city,
+          // Adicionar scores originais
+          malicious_score: malicious,
+          suspicious_score: suspicious,
+          harmless_score: stats.harmless || 0,
+          undetected_score: stats.undetected || 0,
+          total_engines: total,
+        },
       }
     } catch {
       // console.error("VirusTotal query error:", error)
@@ -131,10 +155,28 @@ export class ThreatIntelligenceService {
         status = "suspicious"
       }
 
+      // Para AbuseIPDB, a confiança é o score de abuso
+      // Para itens limpos, vamos inverter a lógica para ser mais intuitiva
+      let finalConfidence = abuseConfidence
+      if (status === "clean") {
+        // Para itens limpos, confiança alta = mais confiável
+        finalConfidence = Math.max(70, 100 - abuseConfidence)
+      }
+
+      // Determinar tipo de ameaça baseado nos relatórios
+      let threatType = undefined
+      if (data.reports && data.reports.length > 0) {
+        const reportTypes = data.reports.map((report: any) => report.type).filter((type: string) => type)
+        if (reportTypes.length > 0) {
+          threatType = reportTypes[0]
+        }
+      }
+
       return {
         value: ip,
         status,
-        confidence: abuseConfidence,
+        confidence: finalConfidence,
+        threat_type: threatType,
         source: "AbuseIPDB",
         country: data.countryCode,
         lastSeen: data.lastReportedAt,
@@ -142,6 +184,13 @@ export class ThreatIntelligenceService {
           abuseConfidence,
           totalReports: data.totalReports,
           isPublic: data.isPublic,
+          isp: data.isp,
+          domain: data.domain,
+          hostnames: data.hostnames,
+          usageType: data.usageType,
+          reports: data.reports,
+          // Adicionar score original
+          abuse_score: abuseConfidence,
         },
       }
     } catch {
@@ -211,23 +260,55 @@ export class ThreatIntelligenceService {
 
     if (maliciousResults.length > 0) {
       finalStatus = "malicious"
+      // Para maliciosos, usar a maior confiança (mais certeza de que é malicioso)
       finalConfidence = Math.max(...maliciousResults.map((r) => r.confidence))
     } else if (suspiciousResults.length > 0) {
       finalStatus = "suspicious"
+      // Para suspeitos, usar a maior confiança (mais certeza de que é suspeito)
       finalConfidence = Math.max(...suspiciousResults.map((r) => r.confidence))
     } else {
-      finalConfidence = Math.max(...results.map((r) => r.confidence))
+      // Para itens limpos, usar a média das confianças (mais equilibrado)
+      const cleanResults = results.filter((r) => r.status === "clean")
+      if (cleanResults.length > 0) {
+        const avgConfidence = cleanResults.reduce((sum, r) => sum + r.confidence, 0) / cleanResults.length
+        finalConfidence = Math.round(avgConfidence)
+      } else {
+        finalConfidence = 70 // Confiança padrão para itens limpos
+      }
     }
+
+    // Combinar informações detalhadas
+    const combinedDetails: any = {}
+    results.forEach((result) => {
+      if (result.details) {
+        Object.assign(combinedDetails, result.details)
+      }
+    })
+
+    // Preservar informações específicas de cada fonte
+    const vtResult = results.find((r) => r.source === "VirusTotal")
+    const abuseResult = results.find((r) => r.source === "AbuseIPDB")
 
     return {
       value: results[0].value,
       status: finalStatus,
       confidence: finalConfidence,
+      threat_type: vtResult?.threat_type || abuseResult?.threat_type,
       source: sources,
       detections: Math.max(...results.map((r) => r.detections || 0)),
       country: results.find((r) => r.country)?.country,
       lastSeen: results.find((r) => r.lastSeen)?.lastSeen,
-      details: results.map((r) => ({ source: r.source, ...r.details })),
+      details: {
+        ...combinedDetails,
+        virusTotal: vtResult?.details,
+        abuseIPDB: abuseResult?.details,
+        // Preservar scores originais
+        vt_malicious_score: vtResult?.details?.malicious_score,
+        vt_suspicious_score: vtResult?.details?.suspicious_score,
+        vt_harmless_score: vtResult?.details?.harmless_score,
+        vt_total_engines: vtResult?.details?.total_engines,
+        abuse_score: abuseResult?.details?.abuse_score,
+      },
     }
   }
 }

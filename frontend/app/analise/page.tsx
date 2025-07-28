@@ -83,6 +83,11 @@ Gere o relatório EXATAMENTE no formato especificado, preenchendo todos os campo
     setIsAnalyzing(true)
 
     try {
+      let promptToSend = undefined
+      if (reportType === "saude-siem") {
+        promptToSend = SAUDE_SIEM_PROMPT.replace("{log}", logText)
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001"}/api/analyze`, {
         method: "POST",
         headers: {
@@ -92,7 +97,7 @@ Gere o relatório EXATAMENTE no formato especificado, preenchendo todos os campo
           logText,
           provider,
           reportType,
-          prompt: reportType === "saude-siem" ? SAUDE_SIEM_PROMPT : undefined,
+          prompt: promptToSend,
         }),
       })
 
@@ -110,7 +115,7 @@ Gere o relatório EXATAMENTE no formato especificado, preenchendo todos os campo
         title: "Análise Concluída",
         description: `Relatório Completo gerado com sucesso.`,
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro na análise:", error)
       toast({
         title: "Erro na Análise",
@@ -130,51 +135,13 @@ Gere o relatório EXATAMENTE no formato especificado, preenchendo todos os campo
     })
   }
 
-  const generateReportText = (report: any) => {
-    // Helper para mostrar apenas campos preenchidos
-    const show = (label: string, value: any) => value ? `${label}: ${value}\n` : '';
-    return `RELATÓRIO DE ANÁLISE DA EQUIPE DE MONITORAMENTO
-
-Prezados(as), ${report.greeting}
-Foi identificado atividade suspeita detectada pela equipe de monitoramento, no seu ambiente. Detalhes para validação:
-
-🕵 Análise: ${report.analysis}
-
-📊 Fonte: ${report.source}
-
-🚨 Severidade: ${report.severity}
-
-🧾 Evidências:
-[Inclua apenas campos com informações disponíveis]
-${show('Data do Log', report.evidence.logDate)}
-${show('Fonte do Log', report.evidence.logSource)}
-${show('Usuário de Origem', report.evidence.originUser)}
-${show('Usuário Afetado', report.evidence.affectedUser)}
-${show('IP/Host de Origem', report.evidence.originIP)}
-${show('IP/Host Afetado', report.evidence.affectedIP)}
-${show('Localização (Origem/Impactado)', report.evidence.location)}
-${show('Tipo do Evento', report.evidence.eventType)}
-${show('Grupo', report.evidence.group)}
-${show('Objeto', report.evidence.object)}
-${show('Nome do Objeto', report.evidence.objectName)}
-${show('Tipo do Objeto', report.evidence.objectType)}
-${show('Assunto', report.evidence.subject)}
-${show('Política', report.evidence.policy)}
-${show('Nome da Ameaça', report.evidence.threatName)}
-${show('Nome do Processo', report.evidence.processName)}
-${show('Nome da Regra MPE', report.evidence.ruleName)}
-${show('Mensagem do Fornecedor', report.evidence.vendorMessage)}
-${show('ID do Fornecedor', report.evidence.vendorId)}
-${show('Identificador de Navegador', report.evidence.userAgent)}
-${show('Ação', report.evidence.action)}
-${show('Status', report.evidence.status)}
-${show('Log', report.evidence.log)}
-
-🕵 Justificativa: [Por que este evento merece atenção? Considere gravidade, contexto, recorrência, possíveis riscos e relação com políticas de segurança.]
-
-📌 Recomendações:
-${report.recommendations.map((rec: string) => `• ${rec}`).join("\n")}
-`
+  const renderEvidenceField = (label: string, value: string | undefined) => {
+    if (!value || value.trim() === "") return null
+    return (
+      <div>
+        <strong>{label}:</strong> {value}
+      </div>
+    )
   }
 
   return (
@@ -356,10 +323,12 @@ ${report.recommendations.map((rec: string) => `• ${rec}`).join("\n")}
                     </div>
 
                     {/* Caso de Uso */}
-                    <div>
-                      <h4 className="font-semibold mb-2 !text-purple-600 dark:!text-purple-400">Caso de uso:</h4>
-                      <p className="text-sm text-muted-foreground bg-muted p-3 rounded">{analysisResult.report.caseUse}</p>
-                    </div>
+                    {analysisResult.report.caseUse && (
+                      <div>
+                        <h4 className="font-semibold mb-2 !text-purple-600 dark:!text-purple-400">Caso de uso:</h4>
+                        <p className="text-sm text-muted-foreground bg-muted p-3 rounded">{analysisResult.report.caseUse}</p>
+                      </div>
+                    )}
 
                     {/* Análise */}
                     <div>
@@ -386,50 +355,48 @@ ${report.recommendations.map((rec: string) => `• ${rec}`).join("\n")}
                       <h4 className="font-semibold mb-3 flex items-center !text-purple-600 dark:!text-purple-400">🧾 Evidências:</h4>
                       <div className="bg-muted p-4 rounded-lg space-y-3 text-sm">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <strong>Data do Log:</strong> {analysisResult.report.evidence.logDate}
-                          </div>
-                          <div>
-                            <strong>Fonte do Log:</strong> {analysisResult.report.evidence.logSource}
-                          </div>
-                          <div>
-                            <strong>Usuário Afetado:</strong> {analysisResult.report.evidence.affectedUser}
-                          </div>
-                          <div>
-                            <strong>IP/Host de Origem:</strong> {analysisResult.report.evidence.originIP}
-                          </div>
-                          <div>
-                            <strong>Tipo do Evento:</strong> {analysisResult.report.evidence.eventType}
-                          </div>
-                          <div>
-                            <strong>Grupo:</strong> {analysisResult.report.evidence.group}
-                          </div>
-                          <div>
-                            <strong>Objeto:</strong> {analysisResult.report.evidence.object}
-                          </div>
-                          <div>
-                            <strong>Assunto:</strong> {analysisResult.report.evidence.subject}
-                          </div>
-                          <div>
-                            <strong>Nome da Ameaça:</strong> {analysisResult.report.evidence.threatName}
-                          </div>
-                          <div>
-                            <strong>Nome da Regra MPE:</strong> {analysisResult.report.evidence.ruleName}
-                          </div>
-                          <div>
-                            <strong>Ação:</strong> {analysisResult.report.evidence.action}
-                          </div>
-                          <div>
-                            <strong>Status:</strong> {analysisResult.report.evidence.status}
-                          </div>
+                          {renderEvidenceField("Data do Log", analysisResult.report.evidence?.logDate)}
+                          {renderEvidenceField("Fonte do Log", analysisResult.report.evidence?.logSource)}
+                          {renderEvidenceField("Usuário de Origem", analysisResult.report.evidence?.originUser)}
+                          {renderEvidenceField("Usuário Afetado", analysisResult.report.evidence?.affectedUser)}
+                          {renderEvidenceField("IP/Host de Origem", analysisResult.report.evidence?.originIP)}
+                          {renderEvidenceField("IP/Host Afetado", analysisResult.report.evidence?.affectedIP)}
+                          {renderEvidenceField("Localização", analysisResult.report.evidence?.location)}
+                          {renderEvidenceField("Tipo do Evento", analysisResult.report.evidence?.eventType)}
+                          {renderEvidenceField("Grupo", analysisResult.report.evidence?.group)}
+                          {renderEvidenceField("Objeto", analysisResult.report.evidence?.object)}
+                          {renderEvidenceField("Nome do Objeto", analysisResult.report.evidence?.objectName)}
+                          {renderEvidenceField("Tipo do Objeto", analysisResult.report.evidence?.objectType)}
+                          {renderEvidenceField("Assunto", analysisResult.report.evidence?.subject)}
+                          {renderEvidenceField("Política", analysisResult.report.evidence?.policy)}
+                          {renderEvidenceField("Nome da Ameaça", analysisResult.report.evidence?.threatName)}
+                          {renderEvidenceField("Nome do Processo", analysisResult.report.evidence?.processName)}
+                          {renderEvidenceField("Nome da Regra MPE", analysisResult.report.evidence?.ruleName)}
+                          {renderEvidenceField("Ação", analysisResult.report.evidence?.action)}
+                          {renderEvidenceField("Status", analysisResult.report.evidence?.status)}
+                          {renderEvidenceField("Resultado", analysisResult.report.evidence?.result)}
                         </div>
 
-                        <div className="mt-4">
-                          <strong>Mensagem do Fornecedor:</strong>
-                          <div className="bg-background p-3 rounded border mt-2 font-mono text-xs">
-                            {analysisResult.report.evidence.vendorMessage}
+                        {analysisResult.report.evidence?.vendorMessage && (
+                          <div className="mt-4">
+                            <strong>Mensagem do Fornecedor:</strong>
+                            <div className="bg-background p-3 rounded border mt-2 font-mono text-xs">
+                              {analysisResult.report.evidence.vendorMessage}
+                            </div>
                           </div>
-                        </div>
+                        )}
+
+                        {analysisResult.report.evidence?.vendorId && (
+                          <div>
+                            <strong>ID do Fornecedor:</strong> {analysisResult.report.evidence.vendorId}
+                          </div>
+                        )}
+
+                        {analysisResult.report.evidence?.browserId && (
+                          <div>
+                            <strong>Identificador de Navegador:</strong> {analysisResult.report.evidence.browserId}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -511,7 +478,7 @@ ${report.recommendations.map((rec: string) => `• ${rec}`).join("\n")}
                       <Button
                         variant="outline"
                         className="flex-1 bg-transparent"
-                        onClick={() => copyToClipboard(generateReportText(analysisResult.report))}
+                        onClick={() => copyToClipboard(analysisResult.reportText)}
                       >
                         <Copy className="h-4 w-4 mr-2" />
                         Copiar Relatório
